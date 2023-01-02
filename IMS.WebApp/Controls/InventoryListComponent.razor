@@ -1,0 +1,30 @@
+﻿@inject IViewInventoriesByNameUseCase ViewInventoriesByNameUseCase
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <InventoryListItemComponent Inventories="@Inventories"></InventoryListItemComponent>
+    </tbody>
+</table>
+
+@code {
+    private List<Inventory> Inventories = new List<Inventory>();
+
+    [Parameter]
+    public string SearchTerm { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The lifecycle event of the component. It is triggered whenever the parameter is changed.
+    /// </summary>
+    protected override async Task OnParametersSetAsync()
+    {
+        Inventories = (await ViewInventoriesByNameUseCase.ExcuteAsync(this.SearchTerm)).ToList();
+    }
+}
