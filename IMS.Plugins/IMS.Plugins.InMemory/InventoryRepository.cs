@@ -13,7 +13,7 @@ namespace IMS.Plugins.InMemory
                 new Inventory {InventoryId = 1, InventoryName = "Bike Seat", Quantity = 10, Price = 2},
                 new Inventory {InventoryId = 2, InventoryName = "Bike Body", Quantity = 10, Price = 15},
                 new Inventory {InventoryId = 3, InventoryName = "Bike Wheels", Quantity = 20, Price = 8},
-                new Inventory {InventoryId = 3, InventoryName = "Bike Pedels", Quantity = 20, Price = 1},
+                new Inventory {InventoryId = 4, InventoryName = "Bike Pedels", Quantity = 20, Price = 1},
             };
         }
 
@@ -35,6 +35,36 @@ namespace IMS.Plugins.InMemory
             _inventories.Add(inventory);
 
             return Task.CompletedTask;
+        }
+
+        public Task UpdateAsync(Inventory inventory)
+        {
+            if (_inventories.Any(x => x.InventoryId != inventory.InventoryId && x.InventoryName.Equals(inventory.InventoryName, StringComparison.OrdinalIgnoreCase)))
+                return Task.CompletedTask;
+
+            var model = _inventories.SingleOrDefault(x => x.InventoryId == inventory.InventoryId);
+
+            if (model != null)
+            {
+                model.InventoryName = inventory.InventoryName;
+                model.Quantity = inventory.Quantity;
+                model.Price = inventory.Price;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public async Task<Inventory> GetInventoryByIdAsync(int inventoryId)
+        {
+            var inv = _inventories.First(x => x.InventoryId == inventoryId);
+            var newInv = new Inventory
+            {
+                InventoryId = inv.InventoryId,
+                InventoryName = inv.InventoryName,
+                Quantity = inv.Quantity,
+                Price = inv.Price
+            };
+            return await Task.FromResult(newInv);
         }
     }
 }

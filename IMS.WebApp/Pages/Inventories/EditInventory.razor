@@ -1,0 +1,61 @@
+﻿@page "/editinventory/{InvId:int}"
+@inject NavigationManager NavigationManager
+@inject IViewInventoryByIdUseCase ViewInventoryByIdUseCase
+@inject IEditInventoryUseCase EditInventoryUseCase
+
+<h3>Edit Inventory</h3>
+<br />
+<EditForm Model="Inventory" OnValidSubmit="SaveInventory">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="form-group">
+        <label for="name">Inventory Name</label>
+        <InputText id="name"
+            @bind-Value="Inventory.InventoryName"
+            class="form-control">
+        </InputText>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <InputNumber id="quantity"
+            @bind-Value="Inventory.Quantity"
+            class="form-control">
+        </InputNumber>
+    </div>
+
+    <div class="form-group">
+        <label for="price">Price</label>
+        <InputNumber id="price"
+            @bind-Value="Inventory.Price"
+            class="form-control">
+        </InputNumber>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int InvId { get; set; }
+
+    private Inventory Inventory = new Inventory();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        this.Inventory = await ViewInventoryByIdUseCase.ExecuteAsync(InvId);
+    }
+
+    private async Task SaveInventory()
+    {
+        await EditInventoryUseCase.ExecuteAsync(this.Inventory);
+        NavigationManager.NavigateTo("inventories");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("inventories");
+    }
+}
