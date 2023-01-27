@@ -18,7 +18,7 @@ namespace IMS.CoreBusiness
         public double Price { get; set; }
 
         [Product_EnsurePriceIsGreaterThanInventoriesCost]
-        public List<ProductInventory> ProductInventories { get; private set; } = new List<ProductInventory>();
+        public List<ProductInventory> ProductInventories { get; set; } = new List<ProductInventory>();
 
         public void AddInventory(Inventory inventory)
         {

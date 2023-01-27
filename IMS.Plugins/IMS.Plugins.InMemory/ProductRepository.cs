@@ -29,6 +29,48 @@ namespace IMS.Plugins.InMemory
             return Task.CompletedTask;
         }
 
+        public async Task<Product?> GetByIdAsync(int productId)
+        {
+            var prod = await Task.FromResult(_products.SingleOrDefault(x => x.ProductId == productId));
+
+            var newProd = new Product();
+            if (prod != null)
+            {
+
+                newProd.ProductId = prod.ProductId;
+                newProd.ProductName = prod.ProductName;
+                newProd.Quantity = prod.Quantity;
+                newProd.Price = prod.Price;
+                newProd.ProductInventories = new List<ProductInventory>();
+
+                if (prod.ProductInventories != null && prod.ProductInventories.Count > 0)
+                {
+                    foreach (var prodInv in prod.ProductInventories)
+                    {
+                        var newProdInv = new ProductInventory
+                        {
+                            ProductId = prodInv.ProductId,
+                            InventoryId = prodInv.InventoryId,
+                            Product = prod,
+                            Inventory = new Inventory(),
+                            InventoryQuantity = prodInv.InventoryQuantity
+                        };
+                        if (prodInv.Inventory != null)
+                        {
+                            newProdInv.Inventory.InventoryId = prodInv.Inventory.InventoryId;
+                            newProdInv.Inventory.InventoryName = prodInv.Inventory.InventoryName;
+                            newProdInv.Inventory.Price = prodInv.Inventory.Price;
+                            newProdInv.Inventory.Quantity = prodInv.Inventory.Quantity;
+                        }
+
+                        newProd.ProductInventories.Add(newProdInv);
+                    }
+                }
+            }
+
+            return newProd;
+        }
+
         public async Task<IEnumerable<Product>> GetByNameAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) return await Task.FromResult(_products);
@@ -36,6 +78,23 @@ namespace IMS.Plugins.InMemory
             return await Task.FromResult(_products.Where(x => x.ProductName.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList());
         }
 
+        public Task UpdateAsync(Product product)
+        {
+            // To prevent different product from having the same name
+            if (_products.Any(x => x.ProductId != product.ProductId &&
+                x.ProductName.ToLower() == product.ProductName.ToLower())) return Task.CompletedTask;
 
+            var prod = _products.SingleOrDefault(x => x.ProductId == product.ProductId);
+
+            if (prod != null)
+            {
+                prod.ProductName = product.ProductName;
+                prod.Quantity = product.Quantity;
+                prod.Price = product.Price;
+                prod.ProductInventories = product.ProductInventories;
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }

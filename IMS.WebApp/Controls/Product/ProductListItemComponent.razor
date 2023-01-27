@@ -1,13 +1,15 @@
-﻿@if(Products!= null && Products.Any())
+﻿@inject NavigationManager NavigationManager
+
+@if(Products!= null && Products.Any())
 {
-    foreach (var item in Products)
+    foreach (var prod in Products)
     {
         <tr>
-            <td>@item.ProductName</td>
-            <td>@item.Quantity</td>
-            <td>@item.Price.ToString("c")</td>
+            <td>@prod.ProductName</td>
+            <td>@prod.Quantity</td>
+            <td>@prod.Price.ToString("c")</td>
             <td>
-                <button class="btn btn-light" @onclick="@(() => EditProduct(item))">Edit</button>
+                <button class="btn btn-light" @onclick="@(() => EditProduct(prod))">Edit</button>
             </td>
         </tr>
     }
@@ -17,8 +19,8 @@
     [Parameter]
     public List<Product> Products { get; set; } = new List<Product>();
 
-    private void EditProduct(Product item)
+    private void EditProduct(Product product)
     {
-        
+        NavigationManager.NavigateTo($"/editproduct/{product.ProductId}");
     }
 }
