@@ -1,0 +1,113 @@
+﻿<div class="form-group">
+    <label for="search">@Label</label>
+    <input type="text"
+           class="form-control"
+           @bind-value="userInput"
+           @bind-value:event="oninput"
+           @onkeyup="OnPressKeys" />
+</div>
+@if (searchResults != null && searchResults.Any())
+{
+    <div class="search-result">
+        <ul>
+            @{
+                var itemIndex = 0;
+                foreach (var item in searchResults)
+                {
+                    <li @key="item.Id" @onclick="@(() => OnSelectItem(item))" class="@(currentIndex == itemIndex ? "current" : "")">@item.Name</li>
+                    itemIndex++;
+                }
+            }
+        </ul>
+    </div>
+}
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public Func<string, List<ItemViewModel>>? SearchFunction { get; set; } = null; // delegate function: public delegate List<ItemViewModel> SearchFunction(string searchTerm);
+
+    [Parameter]
+    public EventCallback<ItemViewModel> OnItemSelected { get; set; }
+
+    public ItemViewModel? selectedItem = null;
+    public List<ItemViewModel>? searchResults = null;
+
+    private ItemViewModel? currentItem = null;
+    private int currentIndex = -1;
+
+    private string _userInput = string.Empty;
+    public string userInput
+    {
+        get => _userInput;
+        set
+        {
+            _userInput = value;
+
+            if (!string.IsNullOrWhiteSpace(_userInput) && SearchFunction != null)
+            {
+                if (selectedItem?.Name != _userInput)
+                {
+                    searchResults = SearchFunction(_userInput);
+
+                    this.selectedItem = null;
+                }
+            }
+            else
+            {
+                this.ClearCurrentItem();
+            }
+        }
+    }
+
+    private void OnSelectItem(ItemViewModel item)
+    {
+        this.ClearCurrentItem();
+
+        if (item != null)
+        {
+            this.selectedItem = item;
+            this.userInput = item.Name;
+            this.OnItemSelected.InvokeAsync(item);
+        }
+    }
+
+    private void ClearCurrentItem()
+    {
+        this.searchResults = null;
+        this.currentIndex = -1;
+        this.currentItem = null;
+    }
+
+    private void OnPressKeys(KeyboardEventArgs e)
+    {
+        if ((e.Code == "ArrowDown" || e.Code == "ArrowUp") && searchResults != null && searchResults.Any())
+        {
+            if (e.Code == "ArrowDown" && currentIndex < searchResults.Count - 1)
+            {
+                currentItem = searchResults[++currentIndex];
+            }
+            else if (e.Code == "ArrowUp")
+            {
+                if (currentIndex > 0)
+                    currentItem = searchResults[--currentIndex];
+                else
+                {
+                    currentItem = null;
+                    currentIndex = -1;
+                }
+            }
+        }
+        else if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            OnSelectItem(currentItem);
+        }
+    }
+
+    public class ItemViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}
