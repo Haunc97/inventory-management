@@ -67,11 +67,11 @@
         this.selectedProduct = null;
     }
 
-    private List<ItemViewModel>? SearchProduct(string name)
+    private async Task<List<ItemViewModel>?> SearchProduct(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return null;
 
-        var invs = ViewProductsByNameUseCase.ExecuteAsync(name).GetAwaiter().GetResult();
+        var invs = await ViewProductsByNameUseCase.ExecuteAsync(name);
 
         return invs.Select(x => new ItemViewModel
             {

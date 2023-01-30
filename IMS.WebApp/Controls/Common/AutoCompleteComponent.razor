@@ -26,7 +26,7 @@
     public string Label { get; set; } = string.Empty;
 
     [Parameter]
-    public Func<string, List<ItemViewModel>>? SearchFunction { get; set; } = null; // delegate function: public delegate List<ItemViewModel> SearchFunction(string searchTerm);
+    public Func<string, Task<List<ItemViewModel>?>> SearchFunction { get; set; } = null; // delegate function: public delegate List<ItemViewModel> SearchFunction(string searchTerm);
 
     [Parameter]
     public EventCallback<ItemViewModel> OnItemSelected { get; set; }
@@ -49,9 +49,7 @@
             {
                 if (selectedItem?.Name != _userInput)
                 {
-                    searchResults = SearchFunction(_userInput);
-
-                    this.selectedItem = null;
+                    ViewItemsAsync();
                 }
             }
             else
@@ -60,6 +58,17 @@
             }
         }
     }
+
+    private async Task ViewItemsAsync()
+    {
+        if (SearchFunction != null)
+        {
+            searchResults = await SearchFunction(_userInput);
+            this.selectedItem = null;
+
+            StateHasChanged();
+        }
+    } 
 
     private void OnSelectItem(ItemViewModel item)
     {

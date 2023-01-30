@@ -84,11 +84,11 @@
         NavigationManager.NavigateTo("/");
     }
 
-    private List<ItemViewModel>? SearchInventory(string name)
+    private async Task<List<ItemViewModel>?> SearchInventory(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return null;
 
-        var invs = ViewInventoriesByNameUseCase.ExcuteAsync(name).GetAwaiter().GetResult();
+        var invs = await ViewInventoriesByNameUseCase.ExcuteAsync(name);
 
         return invs.Select(x => new ItemViewModel
             {
