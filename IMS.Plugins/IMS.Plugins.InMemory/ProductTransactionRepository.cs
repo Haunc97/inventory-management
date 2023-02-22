@@ -3,7 +3,7 @@ using IMS.UseCases.PluginInterfaces;
 
 namespace IMS.Plugins.InMemory
 {
-    public class ProductTransationRepository : IProductTransationRepository
+    public class ProductTransactionRepository : IProductTransactionRepository
     {
         private List<ProductTransation> _productTransations = new List<ProductTransation>();
 
@@ -11,7 +11,7 @@ namespace IMS.Plugins.InMemory
         private readonly IInventoryTransationRepository inventoryTransationRepository;
         private readonly IInventoryRepository inventoryRepository;
 
-        public ProductTransationRepository(IProductRepository productRepository,
+        public ProductTransactionRepository(IProductRepository productRepository,
             IInventoryTransationRepository inventoryTransationRepository,
             IInventoryRepository inventoryRepository)
         {
@@ -49,7 +49,7 @@ namespace IMS.Plugins.InMemory
             {
                 ProductionNumber = productionNumber,
                 ProductId = product.ProductId,
-                QuantityBefore = quantity,
+                QuantityBefore = product.Quantity,
                 ActivityType = ProductTransationType.ProduceProduct,
                 QuantityAfter = product.Quantity + quantity,
                 TransationDate = DateTime.Now,
@@ -61,7 +61,7 @@ namespace IMS.Plugins.InMemory
         {
             _productTransations.Add(new ProductTransation
             {
-                ProductionNumber = salesOrderNumber,
+                SONumber = salesOrderNumber,
                 ProductId = product.ProductId,
                 QuantityBefore = product.Quantity,
                 ActivityType = ProductTransationType.SellProduct,
@@ -72,6 +72,37 @@ namespace IMS.Plugins.InMemory
             });
 
             return Task.CompletedTask;
+        }
+
+        public async Task<IEnumerable<ProductTransation>> GetProductTransactionAsync(string productName, DateTime? dateFrom, DateTime? dateTo, ProductTransationType? activityType)
+        {
+            var prods = (await productRepository.GetByNameAsync(string.Empty)).ToList();
+
+            var query = from p in prods
+                    join pt in _productTransations on p.ProductId equals pt.ProductId
+                    where
+                        (string.IsNullOrWhiteSpace(productName) || p.ProductName.ToLower().IndexOf(productName.ToLower()) >= 0)
+                        &&
+                        (!dateFrom.HasValue || pt.TransationDate >= dateFrom.Value)
+                        &&
+                        (!dateTo.HasValue || pt.TransationDate <= dateTo.Value)
+                        &&
+                        (!activityType.HasValue || pt.ActivityType == activityType.Value)
+                    select new ProductTransation
+                    {
+                        Product = p,
+                        ProductId = pt.ProductId,
+                        ProductTransationId = pt.ProductTransationId,
+                        ProductionNumber = pt.ProductionNumber,
+                        SONumber = pt.SONumber,
+                        ActivityType = pt.ActivityType,
+                        QuantityAfter = pt.QuantityAfter,
+                        QuantityBefore = pt.QuantityBefore,
+                        TransationDate = pt.TransationDate,
+                        UnitPrice = pt.UnitPrice,
+                        DoneBy = pt.DoneBy
+                    };
+            return query;
         }
     }
 }

@@ -8,6 +8,8 @@ namespace IMS.CoreBusiness
 
         public string ProductionNumber { get; set; } = string.Empty;
 
+        public string SONumber { get; set; } = string.Empty;
+
         [Required]
         public int ProductId { get; set; }
 

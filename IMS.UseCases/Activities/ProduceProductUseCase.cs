@@ -6,10 +6,10 @@ namespace IMS.UseCases.Activities
 {
     public class ProduceProductUseCase : IProduceProductUseCase
     {
-        private readonly IProductTransationRepository productTransationRepository;
+        private readonly IProductTransactionRepository productTransationRepository;
         private readonly IProductRepository productRepository;
 
-        public ProduceProductUseCase(IProductTransationRepository productTransationRepository, IProductRepository productRepository)
+        public ProduceProductUseCase(IProductTransactionRepository productTransationRepository, IProductRepository productRepository)
         {
             this.productTransationRepository = productTransationRepository;
             this.productRepository = productRepository;
