@@ -9,6 +9,8 @@
 
 @inject IJSRuntime JSRuntime
 
+@attribute [Authorize(Policy = "Purchasers")]
+
 <h3>Purchase Inventory</h3>
 <br />
 <EditForm id="purchase-form" Model="purchaseViewModel" OnValidSubmit="Purchase">
@@ -53,8 +55,18 @@
 </EditForm>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    private AuthenticationState? authenticationState;
+
     private PurchaseViewModel purchaseViewModel = new PurchaseViewModel();
     private Inventory? selectedInventory = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationStateTask != null) authenticationState = await authenticationStateTask;
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -68,12 +80,17 @@
 
     private async Task Purchase()
     {
-        await PurchaseInventoryUseCase.ExecuteAsync(
-            purchaseViewModel.PONumber,
-            this.selectedInventory,
-            purchaseViewModel.QuantityToPurchase,
-            "System"
-        );
+        if (authenticationState != null &&
+            this.selectedInventory != null &&
+            !string.IsNullOrWhiteSpace(authenticationState.User?.Identity?.Name))
+        {
+            await PurchaseInventoryUseCase.ExecuteAsync(
+                purchaseViewModel.PONumber,
+                this.selectedInventory,
+                purchaseViewModel.QuantityToPurchase,
+                authenticationState.User.Identity.Name
+            );
+        }
 
         this.purchaseViewModel = new PurchaseViewModel();
         this.selectedInventory = null;

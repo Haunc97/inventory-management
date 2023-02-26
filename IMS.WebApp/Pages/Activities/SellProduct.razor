@@ -8,6 +8,8 @@
 
 @inject IJSRuntime JSRuntime
 
+@attribute [Authorize(Policy = "Sales")]
+
 <h3>Sell Product</h3>
 <br />
 <EditForm id="sell-form" Model="sellViewModel" OnValidSubmit="Sell">
@@ -55,8 +57,18 @@
 </EditForm>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    private AuthenticationState? authenticationState;
+
     private SellViewModel sellViewModel = new SellViewModel();
     private Product? selectedProduct = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationStateTask != null) authenticationState = await authenticationStateTask;
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -70,13 +82,18 @@
 
     private async Task Sell()
     {
-        await SellProductUseCase.ExecuteAsync(
-            sellViewModel.SalesOrderNumber,
-            this.selectedProduct,
-            sellViewModel.QuantityToSell,
-            sellViewModel.UnitPrice,
-            "System"
-        );
+        if (authenticationState != null &&
+            selectedProduct != null &&
+            !string.IsNullOrWhiteSpace(authenticationState.User?.Identity?.Name))
+        {
+            await SellProductUseCase.ExecuteAsync(
+                sellViewModel.SalesOrderNumber,
+                this.selectedProduct,
+                sellViewModel.QuantityToSell,
+                sellViewModel.UnitPrice,
+                authenticationState.User.Identity.Name
+            );
+        }
 
         this.Reset();
     }

@@ -1,0 +1,24 @@
+﻿<AuthorizeView>
+    <Authorized>
+        @if (authenticationState != null && !string.IsNullOrWhiteSpace(authenticationState.User?.Identity?.Name))
+        {
+            <span>Hello <strong>@authenticationState.User.Identity.Name</strong></span>
+        }
+        <a href="/identity/account/logout">Sign Out</a>
+    </Authorized>
+    <NotAuthorized>
+        <a href="/identity/account/login">Sign In</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    private AuthenticationState? authenticationState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationStateTask != null) authenticationState = await authenticationStateTask;
+    }
+}

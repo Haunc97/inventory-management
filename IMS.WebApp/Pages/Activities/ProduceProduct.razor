@@ -7,6 +7,8 @@
 
 @inject IJSRuntime JSRuntime
 
+@attribute [Authorize(Policy = "Productions")]
+
 <h3>Produce Product</h3>
 <br />
 <EditForm id="produce-form" Model="produceViewModel" OnValidSubmit="Produce">
@@ -42,8 +44,18 @@
 </EditForm>
 
 @code {
+    private AuthenticationState? authenticationState;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
     private ProduceViewModel produceViewModel = new ProduceViewModel();
     private Product? selectedProduct = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationStateTask != null) authenticationState = await authenticationStateTask;
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -57,11 +69,18 @@
 
     private async Task Produce()
     {
-        await ProduceProductUseCase.ExecuteAsync(
-            produceViewModel.ProductionNumber,
-            this.selectedProduct,
-            produceViewModel.QuantityToProduce,
-            "System");
+        if (this.selectedProduct != null &&
+            authenticationState != null &&
+            !string.IsNullOrWhiteSpace(authenticationState.User?.Identity?.Name)
+        )
+        {
+            await ProduceProductUseCase.ExecuteAsync(
+                produceViewModel.ProductionNumber,
+                this.selectedProduct,
+                produceViewModel.QuantityToProduce,
+                authenticationState.User.Identity.Name
+            );
+        }
 
         this.produceViewModel = new ProduceViewModel();
         this.selectedProduct = null;

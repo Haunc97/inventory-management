@@ -15,19 +15,30 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Configure authorizations
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireClaim("Department", "Administration"));
+    options.AddPolicy("Inventory", policy => policy.RequireClaim("Department", "InventoryManagement"));
+    options.AddPolicy("Sales", policy => policy.RequireClaim("Department", "Sales"));
+    options.AddPolicy("Purchasers", policy => policy.RequireClaim("Department", "Purchasing"));
+    options.AddPolicy("Productions", policy => policy.RequireClaim("Department", "ProductionManagement"));
+});
+
 var constr = builder.Configuration.GetConnectionString("InventoryManagement");
 
-// Configure EF Core for Identity
-//builder.Services.AddDbContext<AccountDbContext>(options =>
-//{
-//    options.UseSqlServer(constr);
-//});
+//Configure EF Core for Identity
+builder.Services.AddDbContext<AccountDbContext>(options =>
+{
+    options.UseSqlServer(constr);
+});
 
-// Configure Identity
-//builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-//{
-//    options.SignIn.RequireConfirmedEmail = true;
-//}).AddEntityFrameworkStores<AccountDbContext>();
+//Configure Identity
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedEmail = false;
+}).AddEntityFrameworkStores<AccountDbContext>();
 
 // Solving the problem of Ef core and blazor
 // Blazor cannot dispose of the DbContext instant properly even if we use the Transient lifetime scope
@@ -92,8 +103,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

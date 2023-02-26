@@ -44,14 +44,17 @@
     {
         <table class="table">
             <thead>
-            <th>Date</th>
-            <th>Inventory</th>
-            <th>Activity</th>
-            <th>Qty Before</th>
-            <th>Qty After</th>
-            <th>Unit Price</th>
-            <th>PO#</th>
-            <th>Production#</th>
+                <tr>
+                    <th>Date</th>
+                    <th>Inventory</th>
+                    <th>Activity</th>
+                    <th>Qty Before</th>
+                    <th>Qty After</th>
+                    <th>Unit Price</th>
+                    <th>PO#</th>
+                    <th>Production#</th>
+                    <th>Done by</th>
+                </tr>
             </thead>
             <tbody>
                 @foreach (var it in inventoryTransactions)
@@ -74,6 +77,7 @@
                         <td>@it.UnitPrice.ToString("c")</td>
                         <td>@it.PONumber</td>
                         <td>@it.ProductionNumber</td>
+                        <td>@it.DoneBy</td>
                     </tr>
                 }
             </tbody>
