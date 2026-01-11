@@ -1,23 +1,12 @@
-﻿using IMS.CoreBusiness;
-using IMS.UseCases.PluginInterfaces;
-using IMS.UseCases.Products.Interfaces;
+﻿namespace IMS.UseCases.Products;
 
-namespace IMS.UseCases.Products
+public class AddProductUseCase(IProductRepository productRepository) : IAddProductUseCase
 {
-    public class AddProductUseCase : IAddProductUseCase
+    public async Task ExecuteAsync(Product product)
     {
-        private readonly IProductRepository productRepository;
-        public AddProductUseCase(IProductRepository productRepository)
-        {
-            this.productRepository = productRepository;
-        }
+        if (product == null)
+            return;
 
-        public async Task ExecuteAsync(Product product)
-        {
-            if (product == null)
-                return;
-
-            await productRepository.AddAsync(product);
-        }
+        await productRepository.AddAsync(product);
     }
 }

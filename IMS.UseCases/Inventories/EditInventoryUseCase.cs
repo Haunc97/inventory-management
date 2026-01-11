@@ -1,20 +1,9 @@
-﻿using IMS.CoreBusiness;
-using IMS.UseCases.Inventories.Interfaces;
-using IMS.UseCases.PluginInterfaces;
+﻿namespace IMS.UseCases.Inventories;
 
-namespace IMS.UseCases.Inventories
+public class EditInventoryUseCase(IInventoryRepository inventoryRepository) : IEditInventoryUseCase
 {
-    public class EditInventoryUseCase : IEditInventoryUseCase
+    public async Task ExecuteAsync(Inventory inventory)
     {
-        private readonly IInventoryRepository inventoryRepository;
-        public EditInventoryUseCase(IInventoryRepository inventoryRepository)
-        {
-            this.inventoryRepository = inventoryRepository;
-        }
-
-        public async Task ExecuteAsync(Inventory inventory)
-        {
-            await inventoryRepository.UpdateAsync(inventory);
-        }
+        await inventoryRepository.UpdateAsync(inventory);
     }
 }

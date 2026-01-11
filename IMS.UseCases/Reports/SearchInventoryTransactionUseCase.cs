@@ -1,31 +1,20 @@
-﻿using IMS.CoreBusiness;
-using IMS.UseCases.PluginInterfaces;
-using IMS.UseCases.Reports.Interfaces;
+﻿namespace IMS.UseCases.Reports;
 
-namespace IMS.UseCases.Reports
+public class SearchInventoryTransactionUseCase(IInventoryTransationRepository inventoryTransationRepository) : ISearchInventoryTransactionUseCase
 {
-    public class SearchInventoryTransactionUseCase : ISearchInventoryTransactionUseCase
+    public async Task<IEnumerable<InventoryTransation>> ExecuteAsync(
+        string inventoryName,
+        DateTime? dateFrom,
+        DateTime? dateTo,
+        InventoryTransationType? transactionType)
     {
-        private readonly IInventoryTransationRepository inventoryTransationRepository;
+        if (dateTo.HasValue) dateTo = dateTo.Value.AddDays(1);
 
-        public SearchInventoryTransactionUseCase(IInventoryTransationRepository inventoryTransationRepository)
-        {
-            this.inventoryTransationRepository = inventoryTransationRepository;
-        }
-        public async Task<IEnumerable<InventoryTransation>> ExecuteAsync(
-            string inventoryName,
-            DateTime? dateFrom,
-            DateTime? dateTo,
-            InventoryTransationType? transactionType)
-        {
-            if (dateTo.HasValue) dateTo = dateTo.Value.AddDays(1);
-
-            return await inventoryTransationRepository.GetInventoryTransationsAsync(
-                inventoryName,
-                dateFrom,
-                dateTo,
-                transactionType
-                );
-        }
+        return await inventoryTransationRepository.GetInventoryTransationsAsync(
+            inventoryName,
+            dateFrom,
+            dateTo,
+            transactionType
+            );
     }
 }

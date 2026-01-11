@@ -25,6 +25,6 @@
     /// </summary>
     protected override async Task OnParametersSetAsync()
     {
-        Inventories = (await ViewInventoriesByNameUseCase.ExcuteAsync(this.SearchTerm)).ToList();
+        Inventories = (await ViewInventoriesByNameUseCase.ExecuteAsync(this.SearchTerm)).ToList();
     }
 }

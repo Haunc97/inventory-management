@@ -1,9 +1,6 @@
-﻿using IMS.CoreBusiness;
+﻿namespace IMS.UseCases.Inventories.Interfaces;
 
-namespace IMS.UseCases.Inventories.Interfaces
+public interface IViewInventoriesByNameUseCase
 {
-    public interface IViewInventoriesByNameUseCase
-    {
-        Task<IEnumerable<Inventory>> ExcuteAsync(string name = "");
-    }
+    Task<IEnumerable<Inventory>> ExecuteAsync(string name = "");
 }

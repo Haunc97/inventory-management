@@ -1,26 +1,15 @@
-﻿using IMS.CoreBusiness;
-using IMS.UseCases.PluginInterfaces;
-using IMS.UseCases.Reports.Interfaces;
+﻿namespace IMS.UseCases.Reports;
 
-namespace IMS.UseCases.Reports
+public class SearchProductTransactionUseCase(IProductTransactionRepository productTransactionRepository) : ISearchProductTransactionUseCase
 {
-    public class SearchProductTransactionUseCase : ISearchProductTransactionUseCase
+    public async Task<IEnumerable<ProductTransation>> ExecuteAsync(string productName, DateTime? dateFrom, DateTime? dateTo, ProductTransationType? activityType)
     {
-        private readonly IProductTransactionRepository productTransactionRepository;
+        if (dateTo.HasValue) dateTo = dateTo.Value.AddDays(1);
 
-        public SearchProductTransactionUseCase(IProductTransactionRepository productTransactionRepository)
-        {
-            this.productTransactionRepository = productTransactionRepository;
-        }
-        public async Task<IEnumerable<ProductTransation>> ExecuteAsync(string productName, DateTime? dateFrom, DateTime? dateTo, ProductTransationType? activityType)
-        {
-            if (dateTo.HasValue) dateTo = dateTo.Value.AddDays(1);
-
-            return await productTransactionRepository.GetProductTransactionAsync(
-                productName,
-                dateFrom,
-                dateTo,
-                activityType);
-        }
+        return await productTransactionRepository.GetProductTransactionAsync(
+            productName,
+            dateFrom,
+            dateTo,
+            activityType);
     }
 }

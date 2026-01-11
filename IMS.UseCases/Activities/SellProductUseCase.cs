@@ -1,28 +1,14 @@
-﻿using IMS.CoreBusiness;
-using IMS.UseCases.Activities.Interfaces;
-using IMS.UseCases.PluginInterfaces;
+﻿namespace IMS.UseCases.Activities;
 
-namespace IMS.UseCases.Activities
+public class SellProductUseCase(IProductTransactionRepository productTransationRepository, IProductRepository productRepository) : ISellProductUseCase
 {
-    public class SellProductUseCase : ISellProductUseCase
+    public async Task ExecuteAsync(string salesOrderNumber, Product product, int quantity, double unitPrice, string doneBy)
     {
-        private readonly IProductTransactionRepository productTransationRepository;
-        private readonly IProductRepository productRepository;
+        //store transaction record
+        await productTransationRepository.SellAsync(salesOrderNumber, product, quantity, unitPrice, doneBy);
 
-        public SellProductUseCase(IProductTransactionRepository productTransationRepository, IProductRepository productRepository)
-        {
-            this.productTransationRepository = productTransationRepository;
-            this.productRepository = productRepository;
-        }
-
-        public async Task ExecuteAsync(string salesOrderNumber, Product product, int quantity, double unitPrice, string doneBy)
-        {
-            //store transaction record
-            await productTransationRepository.SellAsync(salesOrderNumber, product, quantity, unitPrice, doneBy);
-
-            //decrease product quantity
-            product.Quantity -= quantity;
-            await productRepository.UpdateAsync(product);
-        }
+        //decrease product quantity
+        product.Quantity -= quantity;
+        await productRepository.UpdateAsync(product);
     }
 }
