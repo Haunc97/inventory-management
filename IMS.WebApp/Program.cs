@@ -30,6 +30,12 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    await DataSeeder.SeedAsync(userManager);
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
