@@ -11,48 +11,61 @@
 
 @attribute [Authorize(Policy = "Purchasers")]
 
-<h3>Purchase Inventory</h3>
-<br />
-<EditForm id="purchase-form" Model="purchaseViewModel" OnValidSubmit="Purchase">
-    <DataAnnotationsValidator></DataAnnotationsValidator>
-    <ValidationSummary></ValidationSummary>
+<PageTitle>Purchase Inventory - IMS</PageTitle>
 
-    <div class="form-group">
-        <label for="poNo">Purchase Order No.</label>
-        <InputText id="poNo"
-                   class="form-control"
-                   @bind-Value="purchaseViewModel.PONumber">
-        </InputText>
-    </div>
-    <br />
-    <div class="card">
-        <div class="card-body">
-            <AutoCompleteComponent Label="Inventory to Purchase"
-                                   SearchFunction="SearchInventory"
-                                   OnItemSelected="OnItemSelected">
-            </AutoCompleteComponent>
-            <input type="hidden" @bind-value="purchaseViewModel.InventoryId" />
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold text-dark mb-0">Purchase Inventory</h4>
+                <small class="text-muted">Create a new purchase order.</small>
+            </div>
+        </div>
 
-            @if (purchaseViewModel.InventoryId > 0 && purchaseViewModel.InventoryPrice >= 0)
-            {
-                <br />
-                <text>Price: </text>
-                @purchaseViewModel.InventoryPrice.ToString("c");
-            }
+        <div class="dashboard-card">
+            <EditForm id="purchase-form" Model="purchaseViewModel" OnValidSubmit="Purchase">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <ValidationSummary class="text-danger mb-3"></ValidationSummary>
+
+                <div class="mb-3">
+                    <label for="poNo" class="form-label text-muted small text-uppercase fw-bold">Purchase Order No.</label>
+                    <InputText id="poNo"
+                               class="form-control"
+                               @bind-Value="purchaseViewModel.PONumber">
+                    </InputText>
+                </div>
+
+                <div class="mb-3">
+                     <AutoCompleteComponent Label="Inventory Item"
+                                           SearchFunction="SearchInventory"
+                                           OnItemSelected="OnItemSelected">
+                    </AutoCompleteComponent>
+                    <input type="hidden" @bind-value="purchaseViewModel.InventoryId" />
+
+                    @if (purchaseViewModel.InventoryId > 0 && purchaseViewModel.InventoryPrice >= 0)
+                    {
+                        <div class="mt-2 text-muted small">
+                            Current Price: <span class="fw-bold text-dark">@purchaseViewModel.InventoryPrice.ToString("c")</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="mb-4">
+                    <label for="purchaseQty" class="form-label text-muted small text-uppercase fw-bold">Quantity</label>
+                    <InputNumber id="purchaseQty"
+                                 class="form-control"
+                                 @bind-Value="purchaseViewModel.QuantityToPurchase">
+                    </InputNumber>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                     <button type="button" class="btn btn-light" @onclick="Cancel">Cancel</button>
+                     <button type="submit" class="btn btn-primary px-4">Save Purchase</button>
+                </div>
+            </EditForm>
         </div>
     </div>
-    <br />
-    <div class="form-group">
-        <label for="purchaseQty">Quantity to Purchase</label>
-        <InputNumber id="purchaseQty"
-                     class="form-control"
-                     @bind-Value="purchaseViewModel.QuantityToPurchase">
-        </InputNumber>
-    </div>
-    <br />
-    <button type="submit" class="btn btn-primary">Save</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-</EditForm>
+</div>
 
 @code {
     [CascadingParameter]

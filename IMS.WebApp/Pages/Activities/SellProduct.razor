@@ -10,51 +10,63 @@
 
 @attribute [Authorize(Policy = "Sales")]
 
-<h3>Sell Product</h3>
-<br />
-<EditForm id="sell-form" Model="sellViewModel" OnValidSubmit="Sell">
-    <DataAnnotationsValidator></DataAnnotationsValidator>
-    <ValidationSummary></ValidationSummary>
+<PageTitle>Sell Product - IMS</PageTitle>
 
-    <div class="form-group">
-        <label id="saleNo">Sale Order No.</label>
-        <InputText id="saleNo"
-                   @bind-Value="sellViewModel.SalesOrderNumber"
-                   class="form-control">
-        </InputText>
-    </div>
-    <br />
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold text-dark mb-0">Sell Product</h4>
+                <small class="text-muted">Record a sales transaction.</small>
+            </div>
+        </div>
 
-    <div class="card">
-        <div class="card-body">
-            <AutoCompleteComponent Label="Product to sell"
-                                   SearchFunction="SearchProduct"
-                                   OnItemSelected="OnItemSelected">
-            </AutoCompleteComponent>
+        <div class="dashboard-card">
+            <EditForm id="sell-form" Model="sellViewModel" OnValidSubmit="Sell">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <ValidationSummary class="text-danger mb-3"></ValidationSummary>
+
+                <div class="mb-3">
+                    <label id="saleNo" class="form-label text-muted small text-uppercase fw-bold">Sale Order No.</label>
+                    <InputText id="saleNo"
+                               @bind-Value="sellViewModel.SalesOrderNumber"
+                               class="form-control">
+                    </InputText>
+                </div>
+
+                <div class="mb-3">
+                     <AutoCompleteComponent Label="Product to Sell"
+                                           SearchFunction="SearchProduct"
+                                           OnItemSelected="OnItemSelected">
+                    </AutoCompleteComponent>
+                     <!-- Note: Removed the redundant card wrapper around AutoComplete for consistency -->
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="quantity" class="form-label text-muted small text-uppercase fw-bold">Quantity</label>
+                        <InputNumber id="quantity"
+                                     @bind-Value="sellViewModel.QuantityToSell"
+                                     class="form-control">
+                        </InputNumber>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label for="uprice" class="form-label text-muted small text-uppercase fw-bold">Unit Price</label>
+                        <InputNumber id="uprice"
+                                     @bind-Value="sellViewModel.UnitPrice"
+                                     class="form-control">
+                        </InputNumber>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                     <button type="button" class="btn btn-light" @onclick="Reset">Reset</button>
+                     <button type="submit" class="btn btn-primary px-4">Sell</button>
+                </div>
+            </EditForm>
         </div>
     </div>
-
-    <br />
-    <div class="form-group">
-        <label for="quantity">Quantity</label>
-        <InputNumber id="quantity"
-                     @bind-Value="sellViewModel.QuantityToSell"
-                     class="form-control">
-        </InputNumber>
-    </div>
-
-    <div class="form-group">
-        <label for="uprice">Unit Price</label>
-        <InputNumber id="uprice"
-                     @bind-Value="sellViewModel.UnitPrice"
-                     class="form-control">
-        </InputNumber>
-    </div>
-
-    <br />
-    <button type="submit" class="btn btn-primary">Sell</button>
-    <button type="button" class="btn btn-secondary" @onclick="Reset">Reset</button>
-</EditForm>
+</div>
 
 @code {
     [CascadingParameter]

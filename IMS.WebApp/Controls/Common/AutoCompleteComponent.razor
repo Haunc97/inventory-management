@@ -1,32 +1,42 @@
-﻿<div class="form-group">
-    <label for="search">@Label</label>
-    <input type="text"
-           class="form-control"
-           @bind-value="userInput"
-           @bind-value:event="oninput"
-           @onkeyup="OnPressKeys" />
-</div>
-@if (searchResults != null && searchResults.Any())
-{
-    <div class="search-result">
-        <ul>
-            @{
-                var itemIndex = 0;
-                foreach (var item in searchResults)
-                {
-                    <li @key="item.Id" @onclick="@(() => OnSelectItem(item))" class="@(currentIndex == itemIndex ? "current" : "")">@item.Name</li>
-                    itemIndex++;
-                }
-            }
-        </ul>
+﻿<div class="form-group position-relative">
+    <label for="search" class="form-label text-muted small text-uppercase fw-bold">@Label</label>
+    <div class="input-group">
+        <input type="text"
+               class="form-control"
+               @bind-value="userInput"
+               @bind-value:event="oninput"
+               @onkeyup="OnPressKeys"
+               placeholder="Type to search..." />
     </div>
-}
+
+    @if (searchResults != null && searchResults.Any())
+    {
+        <div class="search-result shadow-md rounded border-0 mt-1">
+            <ul class="list-group list-group-flush">
+                @{
+                    var itemIndex = 0;
+                    foreach (var item in searchResults)
+                    {
+                        <li @key="item.Id"
+                            @onclick="@(() => OnSelectItem(item))"
+                            class="list-group-item list-group-item-action @(currentIndex == itemIndex ? "active" : "")"
+                            style="cursor:pointer">
+                            @item.Name
+                        </li>
+                        itemIndex++;
+                    }
+                }
+            </ul>
+        </div>
+    }
+</div>
+
 @code {
     [Parameter]
     public string Label { get; set; } = string.Empty;
 
     [Parameter]
-    public Func<string, Task<List<ItemViewModel>?>> SearchFunction { get; set; } = null; // delegate function: public delegate List<ItemViewModel> SearchFunction(string searchTerm);
+    public Func<string, Task<List<ItemViewModel>?>> SearchFunction { get; set; } = null!;
 
     [Parameter]
     public EventCallback<ItemViewModel> OnItemSelected { get; set; }
@@ -68,7 +78,7 @@
 
             StateHasChanged();
         }
-    } 
+    }
 
     private void OnSelectItem(ItemViewModel item)
     {

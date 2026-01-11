@@ -4,13 +4,25 @@
 
 @attribute [Authorize(Policy = "Inventory")]
 
-<h3>Inventory List</h3>
-<br />
-<SearchInventoryComponent OnSearchInventory="OnInventorySearch"></SearchInventoryComponent>
-<br />
-<InventoryListComponent SearchTerm="@searchTerm"></InventoryListComponent>
-<br />
-<button type="button" class="btn btn-primary" @onclick="AddInventory">Add Inventory</button>
+<PageTitle>Inventories - IMS</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-0">Inventories</h4>
+        <small class="text-muted">Manage your raw materials and stock.</small>
+    </div>
+    <button type="button" class="btn btn-primary" @onclick="AddInventory">
+        <span class="oi oi-plus me-1"></span> New Inventory
+    </button>
+</div>
+
+<div class="dashboard-card">
+    <div class="mb-4" style="max-width: 400px;">
+        <SearchInventoryComponent OnSearchInventory="OnInventorySearch" />
+    </div>
+
+    <InventoryListComponent SearchTerm="@searchTerm" />
+</div>
 
 @code {
     private string searchTerm = string.Empty;

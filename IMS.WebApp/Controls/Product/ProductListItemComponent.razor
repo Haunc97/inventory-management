@@ -5,11 +5,15 @@
     foreach (var prod in Products)
     {
         <tr>
-            <td>@prod.ProductName</td>
+            <td class="fw-medium">@prod.ProductName</td>
             <td>@prod.Quantity</td>
             <td>@prod.Price.ToString("c")</td>
-            <td>
-                <button class="btn btn-light" @onclick="@(() => EditProduct(prod))">Edit</button>
+            <td class="text-end">
+                <button type="button" 
+                        class="btn btn-sm btn-outline-primary" 
+                        @onclick="@(() => EditProduct(prod))">
+                        Edit
+                </button>
             </td>
         </tr>
     }

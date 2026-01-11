@@ -5,24 +5,19 @@
     @foreach (var inv in Inventories)
     {
         <tr>
-            <td>@inv.InventoryName</td>
+            <td class="fw-medium">@inv.InventoryName</td>
             <td>@inv.Quantity</td>
-            <td>@inv.Price.ToString("c")</td> @*c: currency format*@
-            <td>
-                <button
-                    type="button"
-                    class="btn btn-light" @onclick="@(() => EditInventory(inv.InventoryId))">Edit</button>
-                    @*
-                        onclick event is actually a event callback. Event callback is a struct which wraps arround delegate.
-                        So when we use the function without a parameter, it works like a delegate.
-                        But when you attach a parameter, then it's not a delegate anymore. So you can't assign that to the onclick event.
-                        That's why we need to use Arrow Function to provide a delegate
-                    *@
+            <td>@inv.Price.ToString("c")</td>
+            <td class="text-end">
+                <button type="button" 
+                        class="btn btn-sm btn-outline-primary" 
+                        @onclick="@(() => EditInventory(inv.InventoryId))">
+                        Edit
+                </button>
             </td>
         </tr>
     }
 }
-
 
 @code {
     [Parameter]

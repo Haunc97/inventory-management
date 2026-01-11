@@ -3,13 +3,25 @@
 
 @attribute [Authorize(Policy = "Inventory")]
 
-<h3>Product List</h3>
-<br />
-<SearchProductComponent OnSearchProduct="OnSearchProduct"></SearchProductComponent>
-<br />
-<ProductListComponent SearchTerm="@searchTerm"></ProductListComponent>
-<br />
-<button type="button" class="btn btn-primary" @onclick="AddProduct">Add Product</button>
+<PageTitle>Products - IMS</PageTitle>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-0">Products</h4>
+        <small class="text-muted">Manage your finished goods.</small>
+    </div>
+    <button type="button" class="btn btn-primary" @onclick="AddProduct">
+        <span class="oi oi-plus me-1"></span> New Product
+    </button>
+</div>
+
+<div class="dashboard-card">
+    <div class="mb-4" style="max-width: 400px;">
+        <SearchProductComponent OnSearchProduct="OnSearchProduct" />
+    </div>
+
+    <ProductListComponent SearchTerm="@searchTerm" />
+</div>
 
 @code {
     private string searchTerm = string.Empty;

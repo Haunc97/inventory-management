@@ -3,86 +3,99 @@
 @inject ISearchInventoryTransactionUseCase SearchInventoryTransactionUseCase
 @inject IJSRuntime JSRuntime
 
-<h3>Inventory Transaction</h3>
-<br />
+<PageTitle>Inventory Report - IMS</PageTitle>
 
-<div id="printarea">
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold text-dark mb-0">Inventory Transaction Report</h4>
+                <small class="text-muted">View and filter inventory history.</small>
+            </div>
+            <button type="button" class="btn btn-outline-secondary d-print-none" @onclick="PrintReport">
+                <span class="oi oi-print me-2"></span> Print Report
+            </button>
+        </div>
 
-    <div class="row">
-        <div class="col">
-            <label for="invName">Inventory Name</label>
-            <input type="text" id="invName" class="form-control" @bind-value="inventoryName" />
+        <div class="dashboard-card d-print-none mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="invName" class="form-label text-muted small text-uppercase fw-bold">Inventory Name</label>
+                    <input type="text" id="invName" class="form-control" @bind-value="inventoryName" placeholder="Search..." />
+                </div>
+                <div class="col-md-3">
+                    <label for="dfrom" class="form-label text-muted small text-uppercase fw-bold">Date From</label>
+                    <input type="date" id="dfrom" class="form-control" @bind-value="dateFrom" />
+                </div>
+                <div class="col-md-3">
+                    <label for="dto" class="form-label text-muted small text-uppercase fw-bold">Date To</label>
+                    <input type="date" id="dto" class="form-control" @bind-value="dateTo" />
+                </div>
+                <div class="col-md-3">
+                    <label for="act" class="form-label text-muted small text-uppercase fw-bold">Activity Type</label>
+                    <select id="act" class="form-select" @bind="activityTypeId">
+                        <option value="0">All Activities</option>
+                        <option value="1">Purchase Inventory</option>
+                        <option value="2">Produce Product</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mt-3">
+                     <button type="button" class="btn btn-primary w-100" @onclick="SearchInventoryTrans">Search</button>
+                </div>
+            </div>
         </div>
-        <div class="col">
-            <label for="dfrom">Date From</label>
-            <input type="date" id="dfrom" class="form-control" @bind-value="dateFrom" />
-        </div>
-        <div class="col">
-            <label for="dto">Date To</label>
-            <input type="date" id="dto" class="form-control" @bind-value="dateTo" />
-        </div>
-        <div class="col">
-            <label for="act">Activity Type</label>
-            <select id="act" class="form-control" @bind="activityTypeId">
-                <option value="0"></option>
-                <option value="1">Purchase Inventory</option>
-                <option value="2">Produce Product</option>
-            </select>
-        </div>
-        <div class="col">
-            <label>&nbsp;</label>
-            <button type="button" class="btn btn-primary form-control" @onclick="SearchInventoryTrans">Search</button>
-        </div>
-        <div class="col">
-            <label>&nbsp;</label>
-            <button type="button" class="btn btn-primary form-control" @onclick="PrintReport">Print</button>
+
+        <div id="printarea">
+            @if (inventoryTransactions != null)
+            {
+                <div class="dashboard-card p-0 overflow-hidden">
+                    <div class="table-responsive">
+                         <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-secondary text-uppercase small fw-bold">Date</th>
+                                    <th class="text-secondary text-uppercase small fw-bold">Inventory</th>
+                                    <th class="text-secondary text-uppercase small fw-bold">Activity</th>
+                                    <th class="text-secondary text-uppercase small fw-bold">Qty Before</th>
+                                    <th class="text-secondary text-uppercase small fw-bold">Qty After</th>
+                                    <th class="text-secondary text-uppercase small fw-bold">Unit Price</th>
+                                    <th class="text-secondary text-uppercase small fw-bold">Reference#</th>
+                                    <th class="text-secondary text-uppercase small fw-bold">User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var it in inventoryTransactions)
+                                {
+                                    <tr>
+                                        <td>@it.TransationDate.ToString("MM/dd/yyyy")</td>
+                                        <td class="fw-medium">@it.Inventory.InventoryName</td>
+                                        <td>
+                                            @if (it.ActivityType == InventoryTransationType.PurchaseInventory)
+                                            {
+                                                <span class="badge bg-success bg-opacity-10 text-success">Purchase</span>
+                                            }
+                                            else if (it.ActivityType == InventoryTransationType.ProduceProduct)
+                                            {
+                                                <span class="badge bg-warning bg-opacity-10 text-warning">Produce</span>
+                                            }
+                                        </td>
+                                        <td>@it.QuantityBefore</td>
+                                        <td>@it.QuantityAfter</td>
+                                        <td>@it.UnitPrice.ToString("c")</td>
+                                        <td class="small text-muted">
+                                            @if(!string.IsNullOrEmpty(it.PONumber)) { <div>PO: @it.PONumber</div> }
+                                            @if(!string.IsNullOrEmpty(it.ProductionNumber)) { <div>Prod: @it.ProductionNumber</div> }
+                                        </td>
+                                        <td>@it.DoneBy</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
         </div>
     </div>
-    <br />
-
-    @if (inventoryTransactions != null)
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Inventory</th>
-                    <th>Activity</th>
-                    <th>Qty Before</th>
-                    <th>Qty After</th>
-                    <th>Unit Price</th>
-                    <th>PO#</th>
-                    <th>Production#</th>
-                    <th>Done by</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var it in inventoryTransactions)
-                {
-                    <tr>
-                        <td>@it.TransationDate.ToString("MM/dd/yyyy")</td>
-                        <td>@it.Inventory.InventoryName</td>
-                        <td>
-                            @if (it.ActivityType == InventoryTransationType.PurchaseInventory)
-                            {
-                                <text>Purchase</text>
-                            }
-                            else if (it.ActivityType == InventoryTransationType.ProduceProduct)
-                            {
-                                <text>Produce</text>
-                            }
-                        </td>
-                        <td>@it.QuantityBefore</td>
-                        <td>@it.QuantityAfter</td>
-                        <td>@it.UnitPrice.ToString("c")</td>
-                        <td>@it.PONumber</td>
-                        <td>@it.ProductionNumber</td>
-                        <td>@it.DoneBy</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
 </div>
 
 @code {
